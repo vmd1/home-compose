@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  dozzle:
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    image: amir20/dozzle:latest
+    networks:
+      - proxy
+    environment:
+      - DOZZLE_REMOTE_AGENT=100.90.2.104:7007,100.90.2.105:7007,192.168.1.203:7007
+networks:
+  dozzle:
+    name: dozzle
+    ipam:
+      config:
+        - subnet: 172.24.5.0/24
+  proxy:
+    external: true

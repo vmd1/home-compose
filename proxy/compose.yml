@@ -1,0 +1,34 @@
+name: proxy
+services:
+  # Reverse Proxy:
+  # Nginx Proxy Manager
+  nginx-proxy:
+    container_name: proxy-manager
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 81:81
+      - 443:443
+      - 1688:1688
+    volumes:
+      - /srv/proxy/data:/data
+      - /srv/proxy/letsencrypt:/etc/letsencrypt
+      - /srv/proxy/snippets:/snippets
+    networks:
+      - proxy
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - docker-volume-backup.stop-during-backup=true
+networks:
+  #  authelia:
+  #    name: authelia
+  #    external: true
+  #  redis:
+  #    name: redis
+  #    external: true
+  proxy:
+    name: proxy
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

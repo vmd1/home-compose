@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  shlink-web-client:
+    restart: unless-stopped
+    container_name: shlink-web-client
+    environment:
+      - SHLINK_SERVER_URL=https://s.example.com
+      - SHLINK_SERVER_API_KEY=REDACTED
+    image: shlinkio/shlink-web-client
+    networks:
+      - proxy
+      - shlink
+networks:
+  proxy:
+    external: true
+  shlink:
+    external: true

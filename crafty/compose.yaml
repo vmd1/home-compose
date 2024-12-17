@@ -1,0 +1,29 @@
+version: "3"
+services:
+  crafty:
+    container_name: crafty_container
+    image: registry.gitlab.com/crafty-controller/crafty-4:latest
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/London
+    ports:
+      - 10443:8443 # HTTPS
+      - 9982:8123 # DYNMAP
+      - 19132:19132/udp # BEDROCK
+      - 25500-25600:25500-25600 # MC SERV PORT RANGE
+    volumes:
+      - /mnt/huge/crafty/backups:/crafty/backups
+      - /mnt/huge/crafty/logs:/crafty/logs
+      - /mnt/huge/crafty/servers:/crafty/servers
+      - /mnt/huge/crafty/config:/crafty/app/config
+      - /mnt/huge/crafty/import:/crafty/import
+    networks:
+      - proxy
+    deploy:
+      resources:
+        limits:
+          memory: 3g
+          cpus: "1.5"
+networks:
+  proxy:
+    external: true

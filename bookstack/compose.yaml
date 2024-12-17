@@ -1,0 +1,56 @@
+services:
+  bookstack:
+    image: lscr.io/linuxserver/bookstack
+    container_name: bookstack
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - APP_URL=https://bookstack.example.com
+      - DB_HOST=bookstack_db
+      - DB_PORT=3306
+      - DB_USER=bookstack
+      - DB_PASS=REDACTED
+      - DB_DATABASE=bookstackapp
+    volumes:
+      - /srv/bookstack/data:/config
+    restart: unless-stopped
+    depends_on:
+      - bookstack_db
+    networks:
+      - bookstack
+      - proxy
+      - lldap
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - "docker-volume-backup.stop-during-backup=true"
+  bookstack_db:
+    image: lscr.io/linuxserver/mariadb
+    container_name: bookstack_db
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - MYSQL_ROOT_PASSWORD=REDACTED
+      - MYSQL_DATABASE=bookstackapp
+      - MYSQL_USER=bookstack
+      - MYSQL_PASSWORD=REDACTED
+    volumes:
+      - /srv/bookstack/db:/config
+    restart: unless-stopped
+    networks:
+      - bookstack
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - "docker-volume-backup.stop-during-backup=true"  
+
+networks:
+  bookstack:
+    name: bookstack
+    ipam:
+      config:
+        - subnet: 172.24.4.0/24
+  proxy:
+    external: true
+  lldap:
+    external: true

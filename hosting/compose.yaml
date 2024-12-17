@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  hosting-404-page:
+    image: 404-page
+    restart: unless-stopped
+    volumes:
+      - /srv/hosting/404/config:/etc/nginx/conf.d
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true

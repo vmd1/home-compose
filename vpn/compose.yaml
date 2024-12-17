@@ -1,0 +1,36 @@
+version: "3.8"
+volumes:
+  wg-easy_data: null
+services:
+  wg-easy:
+    environment:
+      # Change Language:
+      # (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi)
+      - LANG=en
+      - WG_HOST=vpn.example.com
+      - PASSWORD_HASH=$REDACTED
+      - UI_TRAFFIC_STATS=true
+      - WG_ENABLE_ONE_TIME_LINKS
+    image: ghcr.io/wg-easy/wg-easy
+    container_name: wg-easy
+    volumes:
+      - wg-easy_data:/etc/wireguard
+    ports:
+      - 51820:51820/udp
+      - 51821:51821/tcp
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+      # - NET_RAW # ⚠️ Uncomment if using Podman 
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - proxy
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - "docker-volume-backup.stop-during-backup=true"  
+networks:
+  proxy:
+    external: true

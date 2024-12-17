@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  backup:
+    image: jareware/docker-volume-backup
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Allow use of the "stop-during-backup" feature
+      - /srv:/backup:ro # Mount the Server data volume (as read-only)
+      - /mnt/huge/backups/main:/archive
+networks: {}

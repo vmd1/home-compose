@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  # Redis Caching Database
+  redis:
+    image: redis:alpine
+    container_name: redis
+    volumes:
+      - redis:/data
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/London
+    networks:
+      - authelia
+      - redis
+networks:
+  authelia:
+    external: true
+  redis:
+    name: redis
+    ipam:
+      config:
+        - subnet: 172.22.1.0/24
+volumes:
+  redis:
+    name: "proxy_redis"
+    external: true

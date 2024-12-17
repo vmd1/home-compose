@@ -1,0 +1,71 @@
+name: applications
+services:
+  # Magic Mirror
+  2fauth:
+    image: 2fauth/2fauth
+    container_name: 2fauth
+    restart: unless-stopped
+    volumes:
+      - /srv/2fauth:/2fauth
+    #    ports:
+    #      - 8000:8000/tcp
+    environment:
+      - APP_NAME=2FAuth
+      - APP_ENV=local
+      - APP_TIMEZONE=UTC
+      - APP_DEBUG=false
+      - SITE_OWNER=john@example.com
+      - APP_KEY=REDACTED
+      - APP_URL=https://2fauth.example.com
+      - ASSET_URL=https://2fauth.example.com
+      - IS_DEMO_APP=false
+      - LOG_CHANNEL=daily
+      - LOG_LEVEL=notice
+      - DB_DATABASE="/srv/database/database.sqlite"
+      - CACHE_DRIVER=file
+      - SESSION_DRIVER=file
+      - MAIL_MAILER=log
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_PORT=465
+      - MAIL_USERNAME=john@example.com
+      - MAIL_PASSWORD=REDACTED
+      - MAIL_ENCRYPTION=ssl
+      - MAIL_FROM_NAME=john@example.com
+      - MAIL_FROM_ADDRESS=john@example.com
+      - MAIL_VERIFY_SSL_PEER=true
+      - THROTTLE_API=60
+      - LOGIN_THROTTLE=5
+      - AUTHENTICATION_GUARD=reverse-proxy-guard
+      - AUTHENTICATION_LOG_RETENTION=365
+      - AUTH_PROXY_HEADER_FOR_USER=Remote-User
+      - AUTH_PROXY_HEADER_FOR_EMAIL=Remote-Email
+      - PROXY_LOGOUT_URL=null
+      - WEBAUTHN_NAME=2FAuth
+      - WEBAUTHN_ID=2fauth.example.com
+      - WEBAUTHN_USER_VERIFICATION=preferred
+      - TRUSTED_PROXIES=*
+      - PROXY_FOR_OUTGOING_REQUESTS=null
+      - BROADCAST_DRIVER=log
+      - QUEUE_DRIVER=sync
+      - SESSION_LIFETIME=120
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+      - PUSHER_APP_ID=
+      - PUSHER_APP_KEY=
+      - PUSHER_APP_SECRET=
+      - PUSHER_APP_CLUSTER=mt1
+      - VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+      - VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+      - MIX_ENV=local
+    networks:
+      - proxy
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - docker-volume-backup.stop-during-backup=true
+volumes:
+  magicmirror: null
+networks:
+  proxy:
+    name: proxy
+    external: true

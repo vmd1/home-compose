@@ -1,0 +1,70 @@
+name: homeassistant
+services:
+  # Home Assistant Stuff
+  # Main: HASS
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:2024.10.2
+    volumes:
+      - /srv/homeassistant/data:/config
+      - /mnt/huge/backups/homeassistant:/config/backups
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - docker-volume-backup.stop-during-backup=true
+  # Mosquitto Broker
+  #  mosquitto:
+  #    image: eclipse-mosquitto
+  #    container_name: mosquitto
+  #    restart: unless-stopped
+  #    volumes:
+  #      - /srv/mosquitto:/mosquitto
+  #    ports:
+  #      - 1883:1883
+  #      - 9001:9001
+  #    networks:
+  #      - homeassistant
+  # Eufy Security Websocket API
+  eufy-security-ws:
+    container_name: eufy-security
+    image: bropat/eufy-security-ws:latest
+    restart: always
+    ports:
+      - 127.0.0.1:3000:3000
+    environment:
+      - USERNAME=john@example.com
+      - PASSWORD=REDACTED
+      - PORT=3000
+      - COUNTRY=GB
+    volumes:
+      - eufy-security-ws:/data
+    networks:
+      - homeassistant
+  # RTSP Server Add-on for Home Assistant (Eufy Streaming)
+  rtsp-server:
+    container_name: rtsp-server
+    image: bluenviron/mediamtx:latest
+    environment:
+      - RTSP_PROTOCOLS=tcp
+    restart: unless-stopped
+    networks:
+      - homeassistant
+volumes:
+  eufy-security-ws: null
+networks:
+  homeassistant:
+    name: homeassistant
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+  proxy:
+    name: proxy
+    external: true

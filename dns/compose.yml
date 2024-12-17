@@ -1,0 +1,43 @@
+name: dns
+services:
+  # Technitium DNS Server
+  dns-server:
+    container_name: dns-server
+    hostname: dns-server
+    image: technitium/dns-server:latest
+    # For DHCP deployments, use "host" network mode and remove all the port mappings, including the ports array by commenting them
+    # network_mode: "host"
+    ports:
+      - 5380:5380/tcp #DNS web console (HTTP)
+      - 192.168.1.3:53:53/udp
+      - 192.168.1.3:53:53/tcp
+      - 192.168.1.101:53:53/udp
+      - 192.168.1.101:53:53/tcp
+      - 100.90.1.101:53:53/udp
+      - 100.90.1.101:53:53/tcp
+      # - "853:853/udp" #DNS-over-QUIC service
+      # - "853:853/tcp" #DNS-over-TLS service
+      # - "443:443/udp" #DNS-over-HTTPS service (HTTP/3)
+      # - "443:443/tcp" #DNS-over-HTTPS service (HTTP/1.1, HTTP/2)
+      # - "80:80/tcp" #DNS-over-HTTP service (use with reverse proxy or certbot certificate renewal)
+      # - "8053:8053/tcp" #DNS-over-HTTP service (use with reverse proxy)
+      # - "67:67/udp" #DHCP service      
+    environment:
+      - DNS_SERVER_DOMAIN=node1.dns.example.com #The primary domain name used by this DNS Server to identify itself.
+      - DNS_SERVER_ADMIN_PASSWORD=REDACTED #DNS web console admin user password.
+      - DNS_SERVER_FORWARDERS=1.1.1.1, 8.8.8.8 #Comma separated list of forwarder addresses.
+      # - DNS_SERVER_FORWARDER_PROTOCOL=Tcp #Forwarder protocol options: Udp, Tcp, Tls, Https, HttpsJson.
+      # - DNS_SERVER_LOG_USING_LOCAL_TIME=true #Enable this option to use local time instead of UTC for logging.
+    volumes:
+      - /srv/dns:/etc/dns
+    restart: unless-stopped
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
+    networks:
+      - proxy
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - docker-volume-backup.stop-during-backup=true
+networks:
+  proxy:
+    external: true

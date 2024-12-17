@@ -1,0 +1,48 @@
+version: "3"
+services:
+  lldap:
+    container_name: lldap
+    image: lldap/lldap:latest
+    ports:
+      # For LDAP, not recommended to expose, see Usage section.
+      - 100.90.1.101:3890:3890
+      - 6360:6360
+      - 17170:17170
+    volumes:
+      - /srv/lldap/data:/data
+      # Alternatively, you can mount a local folder
+      # - "./lldap_data:/data"
+    environment:
+      - UID=1000
+      - GID=1000
+      - TZ=Europe/London
+      - LLDAP_JWT_SECRET=REDACTED
+      - LLDAP_KEY_SEED=REDACTED
+      - LLDAP_LDAP_BASE_DN=REDACTED
+      - LLDAP_LDAPS_OPTIONS__ENABLED=true
+      - LLDAP_LDAPS_OPTIONS__CERT_FILE=/data/cert.pem
+      - LLDAP_LDAPS_OPTIONS__KEY_FILE=/data/key.pem
+      # You can also set a different database:
+      # - LLDAP_DATABASE_URL=mysql://mysql-user:password@mysql-server/my-database
+      # - LLDAP_DATABASE_URL=postgres://postgres-user:password@postgres-server/my-database
+    networks:
+      #      - homeassistant
+      - proxy
+      - authelia
+      - lldap
+    restart: always
+    labels:
+      # Adding this label means this container should be stopped while it's being backed up:
+      - docker-volume-backup.stop-during-backup=true
+networks:
+  lldap:
+    name: lldap
+    ipam:
+      config:
+        - subnet: 172.22.3.0/24
+  proxy:
+    external: true
+  #  homeassistant:
+  #    external: true
+  authelia:
+    external: true

@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  ipinfo.tw:
+    restart: unless-stopped
+    container_name: ipinfo.tw
+    image: peterdavehello/ipinfo.tw:latest
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true

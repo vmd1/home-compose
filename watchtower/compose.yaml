@@ -1,0 +1,13 @@
+version: "3.3"
+services:
+  watchtower:
+    restart: unless-stopped
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    image: containrrr/watchtower
+networks:
+  watchtower:
+    ipam:
+      config:
+        - subnet: 172.24.6.0/24

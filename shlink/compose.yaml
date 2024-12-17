@@ -1,0 +1,40 @@
+version: "3"
+services:
+  shlink:
+    image: shlinkio/shlink:stable
+    restart: always
+    environment:
+      - TZ="Europe/London"
+      - DEFAULT_DOMAIN=s.example.com
+      - IS_HTTPS_ENABLED=false
+      - DB_DRIVER=maria
+      - DB_USER=shlink
+      - DB_NAME=shlink
+      - DB_PASSWORD=REDACTED
+      - DB_HOST=database
+      - SHELLVERBOSITY=3
+    depends_on:
+      - database
+    networks:
+      - proxy
+      - shlink
+  database:
+    image: mariadb:10.8
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=REDACTED
+      - MARIADB_DATABASE=shlink
+      - MARIADB_USER=shlink
+      - MARIADB_PASSWORD=REDACTED
+    volumes:
+      - /srv/shlink/db_data:/var/lib/mysql
+    networks:
+      - shlink
+networks:
+  shlink:
+    name: shlink
+    ipam:
+      config:
+        - subnet: 172.24.8.0/24
+  proxy:
+    external: true

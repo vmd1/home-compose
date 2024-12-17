@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  beszel-agent:
+    image: "henrygd/beszel-agent"
+    container_name: "beszel-agent"
+    restart: unless-stopped
+    ports:
+      - 192.168.1.101:45876:45876
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      PORT: 45876
+      KEY: "ssh-ed25519 REDACTED"
+      # FILESYSTEM: /dev/sda1 # set to the correct filesystem for disk I/O stats
+networks: 
+  beszel-agent:
+    name: beszel-agent
+    ipam:
+      config:
+        - subnet: 172.24.2.0/24

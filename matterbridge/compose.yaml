@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  matterbridge:
+    container_name: matterbridge
+    image: ghcr.io/t0bst4r/matterbridge-home-assistant:latest # Matterbridge image with the latest tag
+    network_mode: host # Ensures the Matter mdns works
+    restart: always # Ensures the container always restarts automatically
+    environment:
+      MHA_CONFIG: >
+        {
+          "homeAssistant": {
+            "url": "https://home.example.com/",
+            "accessToken": "REDACTED",
+            "matcher": {
+              "includeDomains": ["input_boolean"]
+              }
+            }
+          }
+    volumes:
+      - /srv/matterbridge/plugins:/root/Matterbridge # Mounts the Matterbridge plugin directory
+      - /srv/matterbridge/data:/root/.matterbridge # Mounts the Matterbridge storage directory
+networks: {}

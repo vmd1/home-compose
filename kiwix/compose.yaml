@@ -1,0 +1,14 @@
+version: "3"
+services:
+  kiwix-serve:
+    restart: unless-stopped
+    image: ghcr.io/kiwix/kiwix-serve:latest
+    container_name: kiwix
+    volumes:
+      - /mnt/huge/wikis:/data
+    networks:
+      - proxy
+    command: "*.zim" # to include all .zim-files in the mounted directory.
+networks:
+  proxy:
+    external: true

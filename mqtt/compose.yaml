@@ -1,0 +1,25 @@
+version: "3.3"
+services:
+  eclipse-mosquitto:
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    ports:
+      - 1883:1883
+    volumes:
+      - /srv/mosquitto/config:/mosquitto/config
+      - /srv/mosquitto/data:/mosquitto/data
+      - /srv/mosquitto/log:/mosquitto/log
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    networks:
+      - homeassistant
+networks:
+  mosquitto:
+    internal: false
+    name: mosquitto
+    ipam:
+      config:
+        - subnet: 172.21.2.0/24
+  homeassistant:
+    external: true

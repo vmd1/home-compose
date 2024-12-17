@@ -1,0 +1,21 @@
+name: management
+services:
+  dockge:
+    container_name: dockge
+    image: louislam/dockge:1
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/dockge/data:/app/data
+      - /srv/compose:/srv/compose
+    ports:
+      - 5001:5001
+    environment:
+      # Tell Dockge where is your stacks directory
+      - DOCKGE_STACKS_DIR=/srv/compose
+    networks:
+      - proxy
+networks:
+  proxy:
+    name: proxy
+    external: true
